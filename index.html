@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#ff7f50">
   <title>Đêm Trung Thu</title>
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
     html, body {
       margin: 0;
@@ -15,13 +16,26 @@
       font-family: 'Mali', cursive;
       overflow: hidden;
     }
-    .stage { position: relative; width: 100%; min-height: 100vh; overflow: hidden; }
-    canvas#starfield { display: block; width: 100%; height: 100%; }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas#starfield {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
     .moon {
       position: absolute;
-      top: 60px; right: 100px;
-      width: 160px; height: 160px;
+      top: 60px;
+      right: 100px;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #fff, #f8f8f8 70%, #e0e0e0 100%);
       box-shadow: 0 0 50px #ffffff7a, 0 0 80px rgba(255,255,255,0.7), 0 0 100px rgba(255,255,255,0.4);
@@ -29,55 +43,120 @@
       animation: moonGlow 6s ease-in-out infinite;
       z-index: 10;
     }
-    @keyframes moonGlow { 0%,100%{opacity:1;} 50%{opacity:0.85;} }
 
-    #lantern-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 10; }
-    .lantern { position: absolute; width: 40px; pointer-events: auto; animation: swing 2.2s ease-in-out infinite; }
-    @keyframes swing { 0%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}100%{transform:rotate(-5deg);} }
+    @keyframes moonGlow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+
+    #lantern-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .lantern {
+      position: absolute;
+      width: 40px;
+      pointer-events: auto;
+      user-select: none;
+      animation: swing 2.2s ease-in-out infinite;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    @keyframes swing {
+      0% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+      100% { transform: rotate(-5deg); }
+    }
 
     #hint {
-      position: fixed; bottom: 80px; left: 50%;
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
       transform: translateX(-50%);
-      color: #ffa722; font-weight: 800;
-      font-size: clamp(16px,4vw,28px);
-      opacity: 0; text-align: center;
+      color: #ffa722;
+      font-weight: 800;
+      font-size: clamp(16px, 4vw, 28px);
+      opacity: 0;
       animation: glowHint 2.5s ease-in-out infinite alternate;
-      text-shadow: 0 0 15px #ff8a50, 0 0 25px #ffd180;
       z-index: 1000;
+      text-align: center;
+      text-shadow: 0 0 15px #ff8a50, 0 0 25px #ffd180;
     }
+
     @keyframes glowHint {
       0% { opacity: 0.3; text-shadow: 0 0 10px #ffb380, 0 0 20px #ffda91; }
       100% { opacity: 1; text-shadow: 0 0 25px #ffae50, 0 0 35px #ffd180; }
     }
 
     #wish-popup {
-      position: fixed; top: 50%; left: 50%;
+      position: fixed;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
       background: rgba(255, 255, 255, 0.96);
-      color: #ff8d22; padding: 25px 30px;
-      border-radius: 12px; font-size: clamp(1rem,3vw,1.8rem);
-      font-weight: 700; display: none; opacity: 0;
-      text-align: center; box-shadow: 0 0 20px #ff8a50, 0 0 25px #ffd180;
-      z-index: 9999; transition: all 0.5s ease;
+      color: #ff8d22;
+      padding: 25px 30px;
+      border-radius: 12px;
+      font-size: clamp(1rem, 3vw, 1.8rem);
+      font-weight: 700;
+      display: none;
+      opacity: 0;
+      text-align: center;
+      box-shadow: 0 0 20px #ff8a50, 0 0 25px #ffd180;
+      z-index: 9999;
+      transition: all 0.5s ease;
     }
-    #wish-popup.show { display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+    #wish-popup.show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
     #intro-overlay {
-      position: fixed; top:0; left:0;
-      width:100%; height:100%;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0,0,0,0.85);
-      display:flex; align-items:center; justify-content:center;
-      text-align:center; z-index:99999;
-      opacity:1; transition:opacity 1.2s ease;
-      color:#ffa722; font-size:clamp(13px,2.8vw,18px);
-      font-weight:700; text-shadow:0 0 15px #ff8a50,0 0 25px #ffd180;
-      line-height:1.9; pointer-events:none; padding:0 8vw; box-sizing:border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 99999;
+      opacity: 1;
+      transition: opacity 1.2s ease;
+      color: #ffa722;
+      font-size: clamp(13px, 2.8vw, 18px);
+      font-weight: 700;
+      text-shadow: 0 0 15px #ff8a50, 0 0 25px #ffd180;
+      line-height: 1.9;
+      pointer-events: none;
+      padding: 0 8vw;
+      box-sizing: border-box;
     }
-    .intro-line { opacity:0; transition:opacity 1s ease; white-space:pre-line; }
-    .intro-line.show { opacity:0.85; }
+
+    .intro-line {
+      opacity: 0;
+      transition: opacity 1s ease;
+      white-space: pre-line;
+    }
+
+    .intro-line.show {
+      opacity: 0.85;
+    }
 
     @media (max-width:600px) {
-      #intro-overlay { font-size:13px; padding:0 10vw; }
+      #intro-overlay {
+        font-size: 13px;
+        padding: 0 10vw;
+      }
     }
   </style>
 </head>
@@ -99,22 +178,48 @@
 
 <script>
 window.addEventListener("DOMContentLoaded", () => {
-  /* === NHẠC NỀN === */
+  /* === Nhạc nền tự động === */
   const bgMusic = document.getElementById("bg-music");
-  let played = false;
-  function startMusic() {
-    if (played) return;
-    played = true;
-    bgMusic.volume = 0.8;
-    bgMusic.muted = false;
-    const promise = bgMusic.play();
-    if (promise) promise.catch(()=>{});
+
+  function autoPlayMusic() {
+    if (!bgMusic || !bgMusic.src) {
+      console.warn("Không tìm thấy file nhạc hoặc phần tử audio.");
+      return;
+    }
+
+    bgMusic.muted = true;
+    bgMusic.volume = 0;
+
+    const playPromise = bgMusic.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          let volume = 0;
+          const fadeInterval = setInterval(() => {
+            if (volume < 0.85) {
+              volume += 0.05;
+              bgMusic.volume = volume;
+            } else {
+              clearInterval(fadeInterval);
+              bgMusic.muted = false;
+            }
+          }, 120);
+        })
+        .catch(error => {
+          console.warn("Tự động phát nhạc bị chặn, chờ tương tác người dùng:", error);
+          const handleInteraction = () => {
+            bgMusic.muted = false;
+            bgMusic.play().catch(err => console.warn("Lỗi phát nhạc sau tương tác:", err));
+            document.removeEventListener("pointerdown", handleInteraction);
+            document.removeEventListener("keydown", handleInteraction);
+          };
+          document.addEventListener("pointerdown", handleInteraction, { once: true });
+          document.addEventListener("keydown", handleInteraction, { once: true });
+        });
+    }
   }
-  // Tự phát sau 0.5s cho PC / Android
-  setTimeout(startMusic, 500);
-  // Bắt buộc người dùng chạm 1 lần trên Safari
-  document.addEventListener("touchstart", startMusic, {once:true});
-  document.addEventListener("mousedown", startMusic, {once:true});
+
+  setTimeout(autoPlayMusic, 800);
 
   /* === Phần tâm sự mở đầu === */
   const introLines = [
@@ -122,95 +227,129 @@ window.addEventListener("DOMContentLoaded", () => {
     "Giờ lớn rồi... Trung thu là những hoài niệm, là mong ước được quay về những ngày vô lo vô nghĩ.",
     "Nhưng... Đừng vì trưởng thành, vì bộn bề công việc mà quên mất bản thân cũng cần được yêu thương.",
     "Hãy sống chậm lại một chút... để cảm nhận ánh trăng, vị bánh, và những điều giản dị từng khiến ta hạnh phúc.",
-    ["Vầng trăng dần tròn vành vạnh","Muôn sự trên đời dần toại ước mong."]
+    ["月亮慢慢变圆,事事慢慢如愿", "Vầng trăng dần tròn vành vạnh", "Muôn sự trên đời dần toại ước mong."]
   ];
+
   const introBox = document.getElementById("intro-overlay");
   const hint = document.getElementById("hint");
   hint.style.opacity = "0";
 
-  async function typeLine(line, el, delay = 45) {
+  async function typeLine(line, element, delay = 45) {
     let text = "";
     for (const ch of line) {
       text += ch;
-      el.textContent = text;
-      await new Promise(r=>setTimeout(r,delay));
+      element.textContent = text;
+      await new Promise(r => setTimeout(r, delay));
     }
   }
 
   async function playIntro(lines) {
     for (const line of lines) {
-      introBox.innerHTML = "";
       const p = document.createElement("div");
       p.className = "intro-line";
+      introBox.innerHTML = "";
       introBox.appendChild(p);
-      setTimeout(()=>p.classList.add("show"),50);
+      setTimeout(() => p.classList.add("show"), 50);
+
       if (Array.isArray(line)) {
-        const full = line.join("\n");
-        await typeLine(full,p,45);
+        const fullText = line.join("\n");
+        await typeLine(fullText, p, 45);
       } else {
-        await typeLine(line,p,45);
+        await typeLine(line, p, 45);
       }
-      await new Promise(r=>setTimeout(r,1200));
+
+      await new Promise(r => setTimeout(r, 1200));
     }
-    await new Promise(r=>setTimeout(r,800));
-    introBox.style.opacity="0";
-    setTimeout(()=>introBox.remove(),1500);
-    setTimeout(()=>{
-      hint.style.transition="opacity 1.8s ease";
-      hint.style.opacity="1";
-    },2500);
+
+    await new Promise(r => setTimeout(r, 800));
+    introBox.style.opacity = "0";
+    setTimeout(() => introBox.remove(), 1500);
+    setTimeout(() => {
+      hint.style.transition = "opacity 1.8s ease";
+      hint.style.opacity = "1";
+    }, 2500);
   }
+
   playIntro(introLines);
 
-  /* === Nền sao === */
+  /* === Hiệu ứng sao và đèn === */
   const canvas = document.getElementById("starfield");
   const ctx = canvas.getContext("2d");
-  let w,h,stars=[],meteors=[];
-  function resizeCanvas(){
-    w=canvas.width=window.innerWidth;
-    h=canvas.height=window.innerHeight;
-    stars=Array.from({length:Math.round((w*h)/2200)},()=>({
-      x:Math.random()*w,y:Math.random()*h,r:Math.random()*0.9+0.1,
-      a:Math.random()*0.8+0.2,t:Math.random()*0.02+0.002
+  let w, h, stars = [], meteors = [];
+
+  function resizeCanvas() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    stars = Array.from({ length: Math.round((w * h) / 2200) }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 0.9 + 0.1,
+      a: Math.random() * 0.8 + 0.2,
+      t: Math.random() * 0.02 + 0.002
     }));
   }
-  function drawStars(){
-    ctx.clearRect(0,0,w,h);
-    for(const s of stars){
-      s.a+=(Math.random()>0.5?1:-1)*s.t;
-      s.a=Math.max(0.05,Math.min(1,s.a));
-      ctx.beginPath();ctx.globalAlpha=s.a;
-      ctx.fillStyle="#fff";ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
-    }ctx.globalAlpha=1;
+
+  function drawStars() {
+    ctx.clearRect(0, 0, w, h);
+    for (const s of stars) {
+      s.a += (Math.random() > 0.5 ? 1 : -1) * s.t;
+      s.a = Math.max(0.05, Math.min(1, s.a));
+      ctx.beginPath();
+      ctx.globalAlpha = s.a;
+      ctx.fillStyle = "#fff";
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   }
-  function createMeteor(){
-    meteors.push({x:Math.random()*w,y:Math.random()*(h/3),
-      vx:12+Math.random()*6,vy:6+Math.random()*3,len:100+Math.random()*80,a:1});
+
+  function createMeteor() {
+    meteors.push({
+      x: Math.random() * w,
+      y: Math.random() * (h / 3),
+      vx: 12 + Math.random() * 6,
+      vy: 6 + Math.random() * 3,
+      len: 100 + Math.random() * 80,
+      a: 1
+    });
   }
-  function drawMeteors(){
-    for(let i=meteors.length-1;i>=0;i--){
-      const m=meteors[i],x2=m.x-m.len,y2=m.y-m.len/2;
-      const grad=ctx.createLinearGradient(m.x,m.y,x2,y2);
-      grad.addColorStop(0,`rgba(255,255,255,${m.a})`);
-      grad.addColorStop(1,"rgba(255,255,255,0)");
-      ctx.strokeStyle=grad;ctx.lineWidth=2;
-      ctx.beginPath();ctx.moveTo(m.x,m.y);ctx.lineTo(x2,y2);ctx.stroke();
-      m.x+=m.vx;m.y+=m.vy;m.a-=0.02;
-      if(m.a<=0||m.x>w+200||m.y>h+200)meteors.splice(i,1);
+
+  function drawMeteors() {
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      const x2 = m.x - m.len;
+      const y2 = m.y - m.len / 2;
+      const grad = ctx.createLinearGradient(m.x, m.y, x2, y2);
+      grad.addColorStop(0, `rgba(255,255,255,${m.a})`);
+      grad.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      m.x += m.vx;
+      m.y += m.vy;
+      m.a -= 0.02;
+      if (m.a <= 0 || m.x > w + 200 || m.y > h + 200) meteors.splice(i, 1);
     }
   }
-  function animate(){
-    drawStars();drawMeteors();
-    if(Math.random()<0.015)createMeteor();
+
+  function animate() {
+    drawStars();
+    drawMeteors();
+    if (Math.random() < 0.015) createMeteor();
     requestAnimationFrame(animate);
   }
-  window.addEventListener("resize",resizeCanvas);
-  resizeCanvas();animate();
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+  animate();
 
   /* === Đèn trời === */
-  const lanternContainer=document.getElementById("lantern-container");
-  const wishPopup=document.getElementById("wish-popup");
-  const wishes=[
+  const lanternContainer = document.getElementById("lantern-container");
+  const wishPopup = document.getElementById("wish-popup");
+  const wishes = [
     "🎑 Chúc một mùa trăng đoàn viên, ngọt ngào như bánh nướng, ấm áp như tình thân",
     "🌕 Trung thu vui vẻ nhé! Chúc bạn luôn rạng rỡ như ánh trăng đêm rằm",
     "Trung thu có trăng, có đèn, có bánh… có thể trọn vẹn bên người yêu thương",
@@ -219,33 +358,46 @@ window.addEventListener("DOMContentLoaded", () => {
     "Trung thu cũng là dịp để nghỉ ngơi và tận hưởng...",
     "Mong mọi ước mơ của bạn đều thành hiện thực 💫"
   ];
-  const lanternImages=["den.png","den2.png","den3.png"];
-  function createLantern(){
-    const lantern=document.createElement("img");
-    lantern.src=lanternImages[Math.floor(Math.random()*lanternImages.length)];
-    lantern.className="lantern";
-    const layer=Math.floor(Math.random()*3)+1;
-    let size=60,duration=10000,opacity=0.8;
-    if(layer===1){size=35;duration=15000;opacity=0.5;}
-    else if(layer===2){size=42;duration=12000;opacity=0.7;}
-    lantern.style.width=size+"px";
-    lantern.style.left=Math.random()*90+"vw";
-    lantern.style.bottom="0";lantern.style.opacity=opacity;
+  const lanternImages = ["den.png", "den2.png", "den3.png"];
+
+  function createLantern() {
+    const lantern = document.createElement("img");
+    lantern.src = lanternImages[Math.floor(Math.random() * lanternImages.length)];
+    lantern.className = "lantern";
+
+    const layer = Math.floor(Math.random() * 3) + 1;
+    let size = 60, duration = 10000, opacity = 0.8;
+    if (layer === 1) { size = 35; duration = 15000; opacity = 0.5; }
+    else if (layer === 2) { size = 42; duration = 12000; opacity = 0.7; }
+
+    lantern.style.width = size + "px";
+    lantern.style.left = Math.random() * 90 + "vw";
+    lantern.style.bottom = "0";
+    lantern.style.opacity = opacity;
+
     lanternContainer.appendChild(lantern);
-    const drift=Math.random()*160-80;
-    const up=120+Math.random()*40;
-    lantern.animate([{transform:"translate(0,0)",opacity:opacity},
-      {transform:`translate(${drift}px,-${up}vh)`,opacity:0}],
-      {duration,easing:"linear",fill:"forwards"});
-    setTimeout(()=>lantern.remove(),duration);
-    lantern.addEventListener("click",e=>{
+
+    const drift = Math.random() * 160 - 80;
+    const up = 120 + Math.random() * 40;
+    lantern.animate(
+      [
+        { transform: "translate(0,0)", opacity: opacity },
+        { transform: `translate(${drift}px, -${up}vh)`, opacity: 0 }
+      ],
+      { duration, easing: "linear", fill: "forwards" }
+    );
+
+    setTimeout(() => lantern.remove(), duration);
+
+    lantern.addEventListener("click", e => {
       e.stopPropagation();
-      wishPopup.textContent=wishes[Math.floor(Math.random()*wishes.length)];
+      wishPopup.textContent = wishes[Math.floor(Math.random() * wishes.length)];
       wishPopup.classList.add("show");
-      setTimeout(()=>wishPopup.classList.remove("show"),3500);
+      setTimeout(() => wishPopup.classList.remove("show"), 3500);
     });
   }
-  setInterval(createLantern,550);
+
+  setInterval(createLantern, 550);
 });
 </script>
 </body>
