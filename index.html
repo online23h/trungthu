@@ -170,7 +170,7 @@
     <div id="hint">Chạm vào đèn trời sẽ có điều bất ngờ</div>
     <div id="intro-overlay"></div>
 
-    <audio id="bg-music" loop preload="auto" playsinline>
+    <audio id="bg-music" loop muted preload="auto" playsinline autoplay>
       <source src="a.mp3" type="audio/mp3" />
       Trình duyệt của bạn không hỗ trợ phát nhạc.
     </audio>
@@ -180,45 +180,26 @@
 window.addEventListener("DOMContentLoaded", () => {
   /* === Nhạc nền tự động === */
   const bgMusic = document.getElementById("bg-music");
-
   function autoPlayMusic() {
-    if (!bgMusic || !bgMusic.src) {
-      console.warn("Không tìm thấy file nhạc hoặc phần tử audio.");
-      return;
-    }
-
-    bgMusic.muted = true;
-    bgMusic.volume = 0;
-
-    const playPromise = bgMusic.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          let volume = 0;
-          const fadeInterval = setInterval(() => {
-            if (volume < 0.85) {
-              volume += 0.05;
-              bgMusic.volume = volume;
-            } else {
-              clearInterval(fadeInterval);
-              bgMusic.muted = false;
-            }
-          }, 120);
-        })
-        .catch(error => {
-          console.warn("Tự động phát nhạc bị chặn, chờ tương tác người dùng:", error);
-          const handleInteraction = () => {
-            bgMusic.muted = false;
-            bgMusic.play().catch(err => console.warn("Lỗi phát nhạc sau tương tác:", err));
-            document.removeEventListener("pointerdown", handleInteraction);
-            document.removeEventListener("keydown", handleInteraction);
-          };
-          document.addEventListener("pointerdown", handleInteraction, { once: true });
-          document.addEventListener("keydown", handleInteraction, { once: true });
-        });
+    try {
+      bgMusic.volume = 0;
+      bgMusic.play().then(() => {
+        let v = 0;
+        const fade = setInterval(() => {
+          if (v < 0.85) { v += 0.05; bgMusic.volume = v; }
+          else clearInterval(fade);
+        }, 120);
+        bgMusic.muted = false;
+      });
+    } catch {
+      const once = () => {
+        bgMusic.muted = false;
+        bgMusic.play().catch(()=>{});
+        document.removeEventListener("pointerdown", once);
+      };
+      document.addEventListener("pointerdown", once);
     }
   }
-
   setTimeout(autoPlayMusic, 800);
 
   /* === Phần tâm sự mở đầu === */
@@ -247,18 +228,19 @@ window.addEventListener("DOMContentLoaded", () => {
     for (const line of lines) {
       const p = document.createElement("div");
       p.className = "intro-line";
-      introBox.innerHTML = "";
+      introBox.innerHTML = ""; // xóa dòng cũ để chỉ hiện một khung
       introBox.appendChild(p);
       setTimeout(() => p.classList.add("show"), 50);
 
       if (Array.isArray(line)) {
+        // Hai câu thơ chung một khung, tách dòng
         const fullText = line.join("\n");
         await typeLine(fullText, p, 45);
       } else {
         await typeLine(line, p, 45);
       }
 
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 1200)); // giữ dòng 1.2s
     }
 
     await new Promise(r => setTimeout(r, 800));
@@ -402,3 +384,5 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
+
