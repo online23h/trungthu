@@ -38,11 +38,8 @@
       height: 160px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #fff, #f8f8f8 70%, #e0e0e0 100%);
-      box-shadow:
-        0 0 50px #ffffff7a,
-        0 0 80px rgba(255, 255, 255, 0.7),
-        0 0 100px rgba(255, 255, 255, 0.4);
-      filter: drop-shadow(0 0 25px rgba(255, 255, 200, 0.8));
+      box-shadow: 0 0 50px #ffffff7a, 0 0 80px rgba(255,255,255,0.7), 0 0 100px rgba(255,255,255,0.4);
+      filter: drop-shadow(0 0 25px rgba(255,255,200,0.8));
       animation: moonGlow 6s ease-in-out infinite;
       z-index: 10;
     }
@@ -131,22 +128,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
       text-align: center;
       z-index: 99999;
       opacity: 1;
       transition: opacity 1.2s ease;
       color: #ffa722;
-      font-size: clamp(14px, 3vw, 20px);
+      font-size: clamp(13px, 2.8vw, 18px);
       font-weight: 700;
       text-shadow: 0 0 15px #ff8a50, 0 0 25px #ffd180;
-      line-height: 1.7;
+      line-height: 1.9;
       pointer-events: none;
+      padding: 0 8vw;
+      box-sizing: border-box;
     }
 
     .intro-line {
       opacity: 0;
-      transition: opacity 1.2s ease;
+      transition: opacity 1s ease;
+      white-space: pre-line;
     }
 
     .intro-line.show {
@@ -154,10 +153,10 @@
     }
 
     @media (max-width:600px) {
-      .moon { top: 40px; right: 14px; width: 70px; height: 70px; }
-      #hint { bottom: 60px; }
-      #wish-popup { max-width: 85%; }
-      #intro-overlay { padding: 22px; }
+      #intro-overlay {
+        font-size: 13px;
+        padding: 0 10vw;
+      }
     }
   </style>
 </head>
@@ -171,204 +170,217 @@
     <div id="hint">Chạm vào đèn trời sẽ có điều bất ngờ</div>
     <div id="intro-overlay"></div>
 
-<audio id="bg-music" loop>
-            <source src="a.mp3" type="audio/mp3">
-            Trình duyệt của bạn không hỗ trợ thẻ audio.
-        </audio>
-    </div>
+    <audio id="bg-music" loop muted preload="auto" playsinline autoplay>
+      <source src="a.mp3" type="audio/mp3" />
+      Trình duyệt của bạn không hỗ trợ phát nhạc.
+    </audio>
+  </div>
 
-    <script>
-  window.addEventListener("DOMContentLoaded", () => {
-
-    const introLines = [
-      "Ngày bé, Trung thu là đèn lồng, là bánh nướng, là rước đèn cùng lũ bạn.",
-      "Giờ lớn rồi... Trung thu là những hoài niệm, là mong ước được quay về những ngày vô lo vô nghĩ.",
-      "Nhưng... Đừng vì trưởng thành, vì bộn bề công việc mà quên mất bản thân cũng cần được yêu thương.",
-      "Hãy sống chậm lại một chút... để cảm nhận ánh trăng, vị bánh, và những điều giản dị từng khiến ta hạnh phúc.",
-      "Vầng trăng dần tròn vành vạnh",
-      "Muôn sự trên đôi dần toại ước mong",
-    ];
-
-    const introBox = document.getElementById("intro-overlay");
-    const hint = document.getElementById("hint");
-    hint.style.opacity = "0";
-
-    async function typeLine(line, element, delay = 40) {
-      let text = "";
-      for (const ch of line) {
-        text += ch;
-        element.textContent = text;
-        await new Promise(r => setTimeout(r, delay));
-      }
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  /* === Nhạc nền tự động === */
+  const bgMusic = document.getElementById("bg-music");
+  function autoPlayMusic() {
+    try {
+      bgMusic.volume = 0;
+      bgMusic.play().then(() => {
+        let v = 0;
+        const fade = setInterval(() => {
+          if (v < 0.85) { v += 0.05; bgMusic.volume = v; }
+          else clearInterval(fade);
+        }, 120);
+        bgMusic.muted = false;
+      });
+    } catch {
+      const once = () => {
+        bgMusic.muted = false;
+        bgMusic.play().catch(()=>{});
+        document.removeEventListener("pointerdown", once);
+      };
+      document.addEventListener("pointerdown", once);
     }
+  }
+  setTimeout(autoPlayMusic, 800);
 
-    async function playIntro(lines) {
-      for (const line of lines) {
-        const p = document.createElement("div");
-        p.className = "intro-line";
-        introBox.appendChild(p);
-        setTimeout(() => p.classList.add("show"), 50);
+  /* === Phần tâm sự mở đầu === */
+  const introLines = [
+    "Ngày bé, Trung thu là đèn lồng, là bánh nướng, là rước đèn cùng lũ bạn.",
+    "Giờ lớn rồi... Trung thu là những hoài niệm, là mong ước được quay về những ngày vô lo vô nghĩ.",
+    "Nhưng... Đừng vì trưởng thành, vì bộn bề công việc mà quên mất bản thân cũng cần được yêu thương.",
+    "Hãy sống chậm lại một chút... để cảm nhận ánh trăng, vị bánh, và những điều giản dị từng khiến ta hạnh phúc.",
+    ["Vầng trăng dần tròn vành vạnh", "Muôn sự trên đời dần toại ước mong."]
+  ];
+
+  const introBox = document.getElementById("intro-overlay");
+  const hint = document.getElementById("hint");
+  hint.style.opacity = "0";
+
+  async function typeLine(line, element, delay = 45) {
+    let text = "";
+    for (const ch of line) {
+      text += ch;
+      element.textContent = text;
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+
+  async function playIntro(lines) {
+    for (const line of lines) {
+      const p = document.createElement("div");
+      p.className = "intro-line";
+      introBox.innerHTML = ""; // xóa dòng cũ để chỉ hiện một khung
+      introBox.appendChild(p);
+      setTimeout(() => p.classList.add("show"), 50);
+
+      if (Array.isArray(line)) {
+        // Hai câu thơ chung một khung, tách dòng
+        const fullText = line.join("\n");
+        await typeLine(fullText, p, 45);
+      } else {
         await typeLine(line, p, 45);
-        await new Promise(r => setTimeout(r, 800));
-        p.classList.remove("show");
-        await new Promise(r => setTimeout(r, 600));
       }
 
-      await new Promise(r => setTimeout(r, 1000));
-      introBox.style.opacity = "0";
-      setTimeout(() => introBox.remove(), 1500);
-      setTimeout(() => {
-        hint.style.transition = "opacity 1.8s ease";
-        hint.style.opacity = "1";
-      }, 2500);
+      await new Promise(r => setTimeout(r, 1200)); // giữ dòng 1.2s
     }
 
-    playIntro(introLines);
+    await new Promise(r => setTimeout(r, 800));
+    introBox.style.opacity = "0";
+    setTimeout(() => introBox.remove(), 1500);
+    setTimeout(() => {
+      hint.style.transition = "opacity 1.8s ease";
+      hint.style.opacity = "1";
+    }, 2500);
+  }
 
-    const canvas = document.getElementById("starfield");
-    const ctx = canvas.getContext("2d");
-    let w, h, stars = [], meteors = [];
+  playIntro(introLines);
 
-    function resizeCanvas() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-      stars = Array.from({ length: Math.round((w * h) / 2200) }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() * 0.9 + 0.1,
-        a: Math.random() * 0.8 + 0.2,
-        t: Math.random() * 0.02 + 0.002
-      }));
+  /* === Hiệu ứng sao và đèn === */
+  const canvas = document.getElementById("starfield");
+  const ctx = canvas.getContext("2d");
+  let w, h, stars = [], meteors = [];
+
+  function resizeCanvas() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    stars = Array.from({ length: Math.round((w * h) / 2200) }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 0.9 + 0.1,
+      a: Math.random() * 0.8 + 0.2,
+      t: Math.random() * 0.02 + 0.002
+    }));
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, w, h);
+    for (const s of stars) {
+      s.a += (Math.random() > 0.5 ? 1 : -1) * s.t;
+      s.a = Math.max(0.05, Math.min(1, s.a));
+      ctx.beginPath();
+      ctx.globalAlpha = s.a;
+      ctx.fillStyle = "#fff";
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
     }
+    ctx.globalAlpha = 1;
+  }
 
-    function drawStars() {
-      ctx.clearRect(0, 0, w, h);
-      for (const s of stars) {
-        s.a += (Math.random() > 0.5 ? 1 : -1) * s.t;
-        s.a = Math.max(0.05, Math.min(1, s.a));
-        ctx.beginPath();
-        ctx.globalAlpha = s.a;
-        ctx.fillStyle = "#fff";
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
+  function createMeteor() {
+    meteors.push({
+      x: Math.random() * w,
+      y: Math.random() * (h / 3),
+      vx: 12 + Math.random() * 6,
+      vy: 6 + Math.random() * 3,
+      len: 100 + Math.random() * 80,
+      a: 1
+    });
+  }
+
+  function drawMeteors() {
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      const x2 = m.x - m.len;
+      const y2 = m.y - m.len / 2;
+      const grad = ctx.createLinearGradient(m.x, m.y, x2, y2);
+      grad.addColorStop(0, `rgba(255,255,255,${m.a})`);
+      grad.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      m.x += m.vx;
+      m.y += m.vy;
+      m.a -= 0.02;
+      if (m.a <= 0 || m.x > w + 200 || m.y > h + 200) meteors.splice(i, 1);
     }
+  }
 
-    function createMeteor() {
-      meteors.push({
-        x: Math.random() * w,
-        y: Math.random() * (h / 3),
-        vx: 12 + Math.random() * 6,
-        vy: 6 + Math.random() * 3,
-        len: 100 + Math.random() * 80,
-        a: 1
-      });
-    }
+  function animate() {
+    drawStars();
+    drawMeteors();
+    if (Math.random() < 0.015) createMeteor();
+    requestAnimationFrame(animate);
+  }
 
-    function drawMeteors() {
-      for (let i = meteors.length - 1; i >= 0; i--) {
-        const m = meteors[i];
-        const x2 = m.x - m.len;
-        const y2 = m.y - m.len / 2;
-        const grad = ctx.createLinearGradient(m.x, m.y, x2, y2);
-        grad.addColorStop(0, `rgba(255,255,255,${m.a})`);
-        grad.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(m.x, m.y);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-        m.x += m.vx;
-        m.y += m.vy;
-        m.a -= 0.02;
-        if (m.a <= 0 || m.x > w + 200 || m.y > h + 200) meteors.splice(i, 1);
-      }
-    }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+  animate();
 
-    function animate() {
-      drawStars();
-      drawMeteors();
-      if (Math.random() < 0.015) createMeteor();
-      requestAnimationFrame(animate);
-    }
+  /* === Đèn trời === */
+  const lanternContainer = document.getElementById("lantern-container");
+  const wishPopup = document.getElementById("wish-popup");
+  const wishes = [
+    "🎑 Chúc một mùa trăng đoàn viên, ngọt ngào như bánh nướng, ấm áp như tình thân",
+    "🌕 Trung thu vui vẻ nhé! Chúc bạn luôn rạng rỡ như ánh trăng đêm rằm",
+    "Trung thu có trăng, có đèn, có bánh… có thể trọn vẹn bên người yêu thương",
+    "Mùa trăng an lành và ngọt ngào 🍂",
+    "Chúc bạn luôn sáng như trăng rằm 🌝",
+    "Trung thu cũng là dịp để nghỉ ngơi và tận hưởng...",
+    "Mong mọi ước mơ của bạn đều thành hiện thực 💫"
+  ];
+  const lanternImages = ["den.png", "den2.png", "den3.png"];
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-    animate();
+  function createLantern() {
+    const lantern = document.createElement("img");
+    lantern.src = lanternImages[Math.floor(Math.random() * lanternImages.length)];
+    lantern.className = "lantern";
 
-    const lanternContainer = document.getElementById("lantern-container");
-    const wishPopup = document.getElementById("wish-popup");
-    const wishes = [
-      "🎑 Chúc một mùa trăng đoàn viên, ngọt ngào như bánh nướng, ấm áp như tình thân",
-      "🌕 Trung thu vui vẻ nhé! Chúc bạn luôn rạng rỡ như ánh trăng đêm rằm",
-      "Trung thu có trăng, có đèn, có bánh… có thể trọn vẹn bên người yêu thương",
-      "Mùa trăng an lành và ngọt ngào 🍂",
-      "Chúc bạn luôn sáng như trăng rằm 🌝",
-      "Trung thu cũng là dịp để nghỉ ngơi và tận hưởng...",
-      "Mong mọi ước mơ của bạn đều thành hiện thực 💫"
-    ];
-    const lanternImages = ["den.png", "den2.png", "den3.png"];
+    const layer = Math.floor(Math.random() * 3) + 1;
+    let size = 60, duration = 10000, opacity = 0.8;
+    if (layer === 1) { size = 35; duration = 15000; opacity = 0.5; }
+    else if (layer === 2) { size = 42; duration = 12000; opacity = 0.7; }
 
-    function createLantern() {
-      const lantern = document.createElement("img");
-      lantern.src = lanternImages[Math.floor(Math.random() * lanternImages.length)];
-      lantern.className = "lantern";
+    lantern.style.width = size + "px";
+    lantern.style.left = Math.random() * 90 + "vw";
+    lantern.style.bottom = "0";
+    lantern.style.opacity = opacity;
 
-      const layer = Math.floor(Math.random() * 3) + 1;
-      let size = 60, duration = 10000, opacity = 0.8;
-      if (layer === 1) { size = 35; duration = 15000; opacity = 0.5; }
-      else if (layer === 2) { size = 42; duration = 12000; opacity = 0.7; }
+    lanternContainer.appendChild(lantern);
 
-      lantern.style.width = size + "px";
-      lantern.style.left = Math.random() * 90 + "vw";
-      lantern.style.bottom = "0";
-      lantern.style.opacity = opacity;
+    const drift = Math.random() * 160 - 80;
+    const up = 120 + Math.random() * 40;
+    lantern.animate(
+      [
+        { transform: "translate(0,0)", opacity: opacity },
+        { transform: `translate(${drift}px, -${up}vh)`, opacity: 0 }
+      ],
+      { duration, easing: "linear", fill: "forwards" }
+    );
 
-      lanternContainer.appendChild(lantern);
+    setTimeout(() => lantern.remove(), duration);
 
-      const drift = Math.random() * 160 - 80;
-      const up = 120 + Math.random() * 40;
-      lantern.animate(
-        [
-          { transform: "translate(0,0)", opacity: opacity },
-          { transform: `translate(${drift}px, -${up}vh)`, opacity: 0 }
-        ],
-        { duration, easing: "linear", fill: "forwards" }
-      );
+    lantern.addEventListener("click", e => {
+      e.stopPropagation();
+      wishPopup.textContent = wishes[Math.floor(Math.random() * wishes.length)];
+      wishPopup.classList.add("show");
+      setTimeout(() => wishPopup.classList.remove("show"), 3500);
+    });
+  }
 
-      setTimeout(() => lantern.remove(), duration);
-
-      lantern.addEventListener("click", e => {
-        e.stopPropagation();
-        wishPopup.textContent = wishes[Math.floor(Math.random() * wishes.length)];
-        wishPopup.classList.add("show");
-        setTimeout(() => wishPopup.classList.remove("show"), 3500);
-      });
-    }
-
-    setInterval(createLantern, 550);
-
-    const bgMusic = document.getElementById("bg-music");
-    function tryPlayMusic() {
-      if (!bgMusic) return;
-      bgMusic.volume = 0.85;
-      const playPromise = bgMusic.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          const oncePlay = () => {
-            bgMusic.play().catch(()=>{});
-            document.removeEventListener("pointerdown", oncePlay);
-          };
-          document.addEventListener("pointerdown", oncePlay);
-        });
-      }
-    }
-    window.addEventListener("load", tryPlayMusic);
-
-  });
-  </script>
+  setInterval(createLantern, 550);
+});
+</script>
 </body>
 </html>
-
