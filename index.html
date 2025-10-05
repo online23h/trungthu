@@ -137,7 +137,7 @@
       opacity: 1;
       transition: opacity 1.2s ease;
       color: #ffa722;
-      font-size: clamp(16px, 4vw, 24px);
+      font-size: clamp(14px, 3vw, 20px);
       font-weight: 700;
       text-shadow: 0 0 15px #ff8a50, 0 0 25px #ffd180;
       line-height: 1.7;
@@ -157,7 +157,7 @@
       .moon { top: 40px; right: 14px; width: 70px; height: 70px; }
       #hint { bottom: 60px; }
       #wish-popup { max-width: 85%; }
-      #intro-overlay { padding: 20px; }
+      #intro-overlay { padding: 22px; }
     }
   </style>
 </head>
@@ -171,7 +171,7 @@
     <div id="hint">Chạm vào đèn trời sẽ có điều bất ngờ</div>
     <div id="intro-overlay"></div>
 
-    <audio id="bg-music" loop preload="auto">
+    <audio id="bg-music" loop>
       <source src="a.mp3" type="audio/mp3" />
     </audio>
   </div>
@@ -316,9 +316,9 @@
       lantern.className = "lantern";
 
       const layer = Math.floor(Math.random() * 3) + 1;
-      let size = 40, duration = 10000, opacity = 0.8;
-      if (layer === 1) { size = 25; duration = 15000; opacity = 0.5; }
-      else if (layer === 2) { size = 35; duration = 12000; opacity = 0.7; }
+      let size = 60, duration = 10000, opacity = 0.8;
+      if (layer === 1) { size = 35; duration = 15000; opacity = 0.5; }
+      else if (layer === 2) { size = 42; duration = 12000; opacity = 0.7; }
 
       lantern.style.width = size + "px";
       lantern.style.left = Math.random() * 90 + "vw";
@@ -370,6 +370,3 @@
   </script>
 </body>
 </html>
-
-
-
